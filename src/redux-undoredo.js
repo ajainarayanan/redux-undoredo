@@ -24,7 +24,7 @@ const isStateSameAsPresent = (state, localState) => {
   }
 };
 
-const undoRedoReducer = (initialState, filterActions) => {
+const undoredoReducer = (initialState, filterActions) => {
   let localHistory = {
     past: [],
     present: initialState,
@@ -56,7 +56,7 @@ const undoRedoReducer = (initialState, filterActions) => {
           present: initialState,
           future: []
         };
-        return state;
+        return initialState;
       // FIXME: This can be better. Need to figure out if there is anyother
       // init events or signals that we can listen to.
       case '@@redux/INIT':
@@ -74,4 +74,28 @@ const undoRedoReducer = (initialState, filterActions) => {
   return undoredo;
 };
 
-export default undoRedoReducer;
+const reducerWrapper = (finalreducer, preloadedstate) => {
+  const undoredo = undoredoReducer(preloadedstate, []);
+  return (state, action) => [finalreducer, undoredo]
+      .reduce((prev, curr) =>
+        curr.bind(null, prev(state, action), action))()
+}
+
+
+const undoredoEnhancer = () => {
+  return (createStore) => {
+    return (reducer, preloadedstate, enhancer) => {
+      const localStore = createStore(
+        reducerWrapper(reducer, preloadedstate),
+        preloadedstate,
+        enhancer
+      );
+      console.log('localstore: ', {...localStore});
+      return {
+        ...localStore
+      };
+    }
+  }
+};
+
+export default undoredoEnhancer;
