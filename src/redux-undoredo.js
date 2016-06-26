@@ -90,7 +90,6 @@ const undoredoEnhancer = () => {
         preloadedstate,
         enhancer
       );
-      console.log('localstore: ', {...localStore});
       return {
         ...localStore
       };
