@@ -1,6 +1,6 @@
 {
   "name": "redux-undoredo",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A generic undo-redo reducer that can be used against any redux store. ",
   "main": "./dist/redux-undoredo.js",
   "scripts": {
