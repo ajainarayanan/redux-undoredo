@@ -2,6 +2,7 @@
   "name": "redux-undoredo",
   "version": "2.0.0",
   "description": "A generic undo-redo reducer that can be used against any redux store. ",
+  "repository": "https://github.com/ajainarayanan/redux-undoredo",
   "main": "./dist/redux-undoredo.js",
   "scripts": {
     "prod-build": "webpack -p",
@@ -24,6 +25,10 @@
     "babel-loader": "^6.2.4",
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-stage-2": "^6.5.0",
+    "expect.js": "^0.3.1",
+    "mocha": "^2.5.3",
+    "node-uuid": "^1.4.7",
+    "redux": "^3.5.2",
     "webpack": "^1.13.1"
   }
 }
