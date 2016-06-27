@@ -6,7 +6,9 @@
   "main": "./dist/redux-undoredo.js",
   "scripts": {
     "prod-build": "webpack -p",
-    "dev-build": "webpack -d"
+    "dev-build": "webpack -d",
+    "test": "mocha --compilers js:babel-core/register",
+    "test-watch": "mocha --compilers js:babel-core/register --watch"
   },
   "keywords": [
     "Redux",
