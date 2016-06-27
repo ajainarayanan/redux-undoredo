@@ -22,16 +22,21 @@ Either way I feel is a good approach. Its just that I wanted a more enhanceable 
 
 #### How to use?
 
+`npm install redux-undoredo --save`
+
+
 The library as it is exports a redux-enhancer. This needs to be passed to `createStore` as something like this,
 
 ```
+  import undoredoEnhancer  from 'redux-undoredo';
+
   let store = createStore(
     rootReducer,
     initialState,
     compose.apply(
       null,
       applyMiddleware.apply(null, middlwares),
-      enhancer() // <-- this is where the enhancers go.
+      undoredoEnhancer() // <-- this is where the enhancers go.
     )
   )
 ```
