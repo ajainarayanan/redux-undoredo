@@ -2,7 +2,6 @@
 @flow
 */
 type Action = Object;
-type strictAny = Object | number | string | boolean;
 import equal from 'deep-equal';
 import sortKeys from 'sort-keys';
 
@@ -26,22 +25,25 @@ const isStateSameAsPresent = (state : ?any, localState : ?any): boolean => {
   }
 };
 
-const undoredoReducer = (initialState: strictAny, filterActions : Array<string> = [])=> {
+const undoredoReducer = (initialState: ?Object, filterActions : Array<string> = []) => {
 
-  let localHistory : Array<strictAny> = [];
+  let localHistory : Array<Object> = [];
   let pivot = 0;
-
-  const undoredo = (state : strictAny = initialState, action : Action = {}) : strictAny => {
+  let defaultValue : Object = {};
+  // The state has to be an object and we can be certain that this state receives the default value
+  // from the previous reducers all the time.
+  // We have defaultValue set to {} to full the contract of return value.
+  const undoredo = (state : Object, action : Action = {}) : Object => {
     if (filterActions.indexOf(action.type) !== -1) {
       return state;
     }
     switch(action.type) {
       case 'UNDO':
-        if (!localHistory.length || !pivot) {
-          return state;
+        if (!localHistory.length || !(pivot - 1)) {
+          return defaultValue;
         }
         pivot -= 1;
-        return (!pivot ? initialState : localHistory[pivot - 1]);
+        return localHistory[pivot - 1];
       case 'REDO':
         if (localHistory.length === pivot) {
           return state;
@@ -49,12 +51,13 @@ const undoredoReducer = (initialState: strictAny, filterActions : Array<string> 
         pivot += 1;
         return localHistory[pivot - 1];
       case 'RESET':
-        localHistory = [];
-        pivot = 0;
-        return initialState;
+        localHistory = [defaultValue];
+        pivot = 1;
+        return defaultValue;
       // FIXME: This can be better. Need to figure out if there is anyother
       // init events or signals that we can listen to.
       case '@@redux/INIT':
+        defaultValue = state;
         return state;
       default:
         if (isStateSameAsPresent(state, localHistory[pivot])) {
@@ -70,7 +73,7 @@ const undoredoReducer = (initialState: strictAny, filterActions : Array<string> 
   return undoredo;
 };
 
-const reducerWrapper = (finalreducer, preloadedstate) => {
+const reducerWrapper = (finalreducer: Function, preloadedstate: ?Object) => {
   const undoredo = undoredoReducer(preloadedstate, []);
   return (state, action) => [finalreducer, undoredo]
       .reduce((prev, curr) =>
@@ -80,7 +83,7 @@ const reducerWrapper = (finalreducer, preloadedstate) => {
 
 const undoredoEnhancer = () => {
   return (createStore: Function) => {
-    return (reducer: Function, preloadedstate : Object, enhancer : ?Function) => {
+    return (reducer: Function, preloadedstate : ?Object, enhancer : ?Function) => {
       const localStore = createStore(
         reducerWrapper(reducer, preloadedstate),
         preloadedstate,
