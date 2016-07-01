@@ -19,6 +19,7 @@
   "author": "ajainarayanan",
   "license": "MIT",
   "dependencies": {
+    "clone": "^1.0.2",
     "deep-equal": "^1.0.1",
     "sort-keys": "^1.1.2"
   },

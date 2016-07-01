@@ -5,6 +5,8 @@ type Action = Object;
 import equal from 'deep-equal';
 import sortKeys from 'sort-keys';
 
+var clone = require('clone');
+
 const isStateSameAsPresent = (state : ?any, localState : ?any): boolean => {
   let typeOfState = typeof state;
   let sortedState, sortedLocalState;
@@ -57,7 +59,7 @@ const undoredoReducer = (initialState: ?Object, filterActions : Array<string> = 
       // FIXME: This can be better. Need to figure out if there is anyother
       // init events or signals that we can listen to.
       case '@@redux/INIT':
-        defaultValue = state;
+        defaultValue = clone(state);
         return state;
       default:
         if (isStateSameAsPresent(state, localHistory[pivot])) {
@@ -65,7 +67,7 @@ const undoredoReducer = (initialState: ?Object, filterActions : Array<string> = 
         }
 
         localHistory = localHistory.slice(0 , pivot);
-        localHistory.push(state);
+        localHistory.push(clone(state));
         pivot += 1;
         return state;
     }
