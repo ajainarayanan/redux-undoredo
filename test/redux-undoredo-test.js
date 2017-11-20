@@ -5,7 +5,7 @@ import {combineReducers, createStore, applyMiddleware, compose} from 'redux';
 import undoredoEnhancer from '../dist/redux-undoredo.js';
 import { nodes, connections } from './reducers';
 import uuid from 'node-uuid';
-import { addNode, removeNode, addConnection, resetStore, undoLastAction, redoLastUndoAction} from './action-creators';
+import { addNode, removeNode, addConnection, resetStore, undoLastAction, redoLastUndoAction, modifyNode} from './action-creators';
 
 var store,
     initialState = {
@@ -297,3 +297,32 @@ describe('Enhancer 4 - Worst cases', function() {
     resetStore(store);
   });
 });
+
+describe('Enhancer 5 - UNDO/REDO should work while modifying reference', function() {
+  it('Case 1 - Redo modifying a node', function() {
+    let node1 = generateNode(),
+        node2 = generateNode();
+    addNode(node1, store);
+    addNode(node2, store);
+    expect(store.getState()).to.eql({
+      nodes: [node1, node2],
+      connections: []
+    });
+    let newname = 'NewNodeName';
+    modifyNode(node1.id, store, newname);
+    expect(store.getState()).to.eql({
+      nodes: [{id: node1.id, name: newname}, node2],
+      connections: []
+    });
+    undoLastAction(store);
+    expect(store.getState()).to.eql({
+      nodes: [node1, node2],
+      connections: []
+    });
+    redoLastUndoAction(store);
+    expect(store.getState()).to.eql({
+      nodes: [{id: node1.id, name: newname}, node2],
+      connections: []
+    });
+  })
+})

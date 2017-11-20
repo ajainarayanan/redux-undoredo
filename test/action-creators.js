@@ -25,3 +25,12 @@ export function undoLastAction(_store) {
 export function redoLastUndoAction(_store) {
   _store.dispatch({ type: 'REDO' });
 }
+export function modifyNode(nodeId, _store, name) {
+  _store.dispatch({
+    type: 'MODIFY_NODE',
+    payload: {
+      name,
+      nodeId
+    }
+  });
+}

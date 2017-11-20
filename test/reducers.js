@@ -8,6 +8,19 @@ export function nodes(state = [], action = {}) {
       ];
     case 'REMOVE-NODE':
       return state.filter( node => node.id !== action.payload.nodeId );
+    case 'MODIFY_NODE': {
+      let newState = state.map(node => {
+        if (node.id === action.payload.nodeId) {
+          return {
+            ...node,
+            name: action.payload.name
+          };
+        }
+        return node;
+      });
+      console.log(newState);
+      return newState;
+    }
     default:
       return state;
   }
