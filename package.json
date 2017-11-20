@@ -19,8 +19,8 @@
   "author": "ajainarayanan",
   "license": "MIT",
   "dependencies": {
-    "clone": "^1.0.2",
     "deep-equal": "^1.0.1",
+    "lodash.clonedeep": "^4.5.0",
     "sort-keys": "^1.1.2"
   },
   "devDependencies": {

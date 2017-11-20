@@ -5,7 +5,7 @@ type Action = Object;
 import equal from 'deep-equal';
 import sortKeys from 'sort-keys';
 
-var clone = require('clone');
+var clone = require('lodash.clonedeep');
 
 const isStateSameAsPresent = (state : ?any, localState : ?any): boolean => {
   let typeOfState = typeof state;
@@ -45,13 +45,13 @@ const undoredoReducer = (initialState: ?Object, filterActions : Array<string> = 
           return defaultValue;
         }
         pivot -= 1;
-        return localHistory[pivot - 1];
+        return clone(localHistory[pivot - 1]);
       case 'REDO':
         if (localHistory.length === pivot) {
           return state;
         }
         pivot += 1;
-        return localHistory[pivot - 1];
+        return clone(localHistory[pivot - 1]);
       case 'RESET':
         localHistory = [defaultValue];
         pivot = 1;
@@ -78,10 +78,30 @@ const undoredoReducer = (initialState: ?Object, filterActions : Array<string> = 
 const reducerWrapper = (finalreducer: Function, preloadedstate: ?Object) => {
   const undoredo = undoredoReducer(preloadedstate, []);
   return (state, action) => [finalreducer, undoredo]
-      .reduce((prev, curr) =>
-        curr.bind(null, prev(state, action), action))()
+    .reduce((prev, curr) =>
+      curr.bind(null, prev(state, action), action))()
 }
 
+/*
+  Shameless copy paste from redux. To avoid importing the entire library :(
+*/
+function compose(...funcs) {
+  if (funcs.length === 0) {
+    return arg => arg
+  }
+
+  if (funcs.length === 1) {
+    return funcs[0]
+  }
+
+  return funcs.reduce((a, b) => (...args) => a(b(...args)))
+}
+const composeEnhancers =
+  typeof window === 'object' &&
+  window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
+    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
+      name: 'UNDOREDOSTORE'
+    }) : compose;
 
 const undoredoEnhancer = () => {
   return (createStore: Function) => {
@@ -89,7 +109,7 @@ const undoredoEnhancer = () => {
       const localStore = createStore(
         reducerWrapper(reducer, preloadedstate),
         preloadedstate,
-        enhancer
+        composeEnhancers()
       );
       return {
         ...localStore
