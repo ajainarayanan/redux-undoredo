@@ -5,7 +5,7 @@ type Action = Object;
 import equal from 'deep-equal';
 import sortKeys from 'sort-keys';
 
-var clone = require('clone');
+var clone = require('lodash.clonedeep');
 
 const isStateSameAsPresent = (state : ?any, localState : ?any): boolean => {
   let typeOfState = typeof state;
@@ -45,13 +45,13 @@ const undoredoReducer = (initialState: ?Object, filterActions : Array<string> = 
           return defaultValue;
         }
         pivot -= 1;
-        return localHistory[pivot - 1];
+        return clone(localHistory[pivot - 1]);
       case 'REDO':
         if (localHistory.length === pivot) {
           return state;
         }
         pivot += 1;
-        return localHistory[pivot - 1];
+        return clone(localHistory[pivot - 1]);
       case 'RESET':
         localHistory = [defaultValue];
         pivot = 1;
