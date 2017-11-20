@@ -27,7 +27,7 @@ Either way I feel is a good approach. Its just that I wanted a more enhanceable 
 
 The library as it is exports a redux-enhancer. This needs to be passed to `createStore` as something like this,
 
-```
+```js
   import undoredoEnhancer  from 'redux-undoredo';
 
   let store = createStore(
@@ -45,7 +45,7 @@ Enhancers are nothing but an extensions to redux store. Its an organic way of ad
 
 Once you have enhanced your store you could now dispatch actions like the following,
 
-```
+```js
   ...
   dispatch({type: 'UNDO'});
   ...
@@ -69,7 +69,7 @@ I am still experimenting with the library. I am not sure if this is the right ap
 [1] - This is the use case I bumped which made me think about making this library as an enhancer,
 
 configstore.js
-```
+```js
 const rootReducer = combineReducer({
   nodes: undoable(nodesReducer),
   connections: undoable(connectionsReducer)
@@ -78,9 +78,10 @@ let store = createStore(
   rootReducer
 );
 ```
+
 Now lets say I add two nodes and connect them together. The state's transition goes something like this,
 
-```
+```js
 initialState -  {
   nodes: [],
   connections: []
@@ -100,22 +101,24 @@ State 3 - {
   nodes: [node1, node2],
   connections: [{from: node1, to: node2}]
 };
-
 ```
+
 Now when I undo my last action and go to back to my previous state, my expectation is to remove just the last connection I created. Something like this,
 
-```
+```js
  Undo State - {
    nodes: [node1, node2],
    connections: []
  };
  ```
+
  However since you wrapped both nodes and connections with `undoable` now both will handle the undo independently. Instead of my expected state the following state will be resolved,
 
- ```
+ ```js
  undoable's version of State - {
    nodes: [node1],
    connections: []
  };
  ```
- This is expected as we have an undoable high-order reducer on both nodes and connections.
+
+This is expected as we have an undoable high-order reducer on both nodes and connections.
